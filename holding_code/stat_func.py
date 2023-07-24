@@ -900,7 +900,7 @@ def e_for_margin_error(confidence_level, x, n):
     return critical_value(confidence_level) * (((p * q) / n)**0.5)
 
 
-def find_t_distribution(n, confidence_level):
+def find_t_distribution(confidence_level, n):
     """
     Finds the critical value for the Student's t-distribution.
 
@@ -928,7 +928,7 @@ def e_mar_err_with_t(confidence_level, s, n):
     Returns:
     - E: The margin of error.
     """
-    return find_t_distribution(n, confidence_level) * (s / n**0.5)
+    return find_t_distribution(confidence_level, n) * (s / n**0.5)
 
 
 def mar_err_with_t(confidence_level, s, n, mean_):
@@ -1053,3 +1053,71 @@ def mar_err_two_means(mean1, mean2, E):
     """
     means_sub = mean1 - mean2
     return means_sub - E, means_sub + E
+
+
+def t_for_proportion(p_hat, p, n):
+    q = 1 - p
+    numerator = p_hat - p
+    denominator = ((p * q) / n) ** 0.5
+    return numerator / denominator
+
+
+def t_for_sta(pop_deviation, sample_deviation, n):
+    numerator = (n - 1) * sample_deviation ** 2
+    denominator = pop_deviation ** 2
+    return numerator / denominator
+
+
+def t_for_mean(mean_x, u, s, n):
+    numerator = mean_x - u
+    denominator = s / (n ** 0.5)
+    return numerator / denominator
+
+
+def r_coefficient(data):
+    n = len(data)
+    if type(data) == dict:
+        numerator = (n * sum([x * y for x, y in data.items()])) - \
+                    (sum([x for x in data.keys()]) * sum([y for y in data.values()]))
+        denominator = ((n * sum([x ** 2 for x in data.keys()])) - (sum([x for x in data.keys()]) ** 2)) ** 0.5 * \
+                      ((n * sum([y ** 2 for y in data.values()])) - (sum(y for y in data.values()) ** 2)) ** 0.5
+        return numerator / denominator
+    else:
+        numerator = (n * sum([x * y for x, y in data])) - \
+                    (sum([x for x, _ in data]) * sum([y for _, y in data]))
+        denominator = ((n * sum([x ** 2 for x, _ in data])) - (sum([x for x, _ in data]) ** 2)) ** 0.5 * \
+                      ((n * sum([y ** 2 for _, y in data])) - (sum(y for _, y in data) ** 2)) ** 0.5
+        return numerator / denominator
+
+
+def test_stat_correlation(r, n):
+    return r / (((1 - r**2) / (n - 2)) ** 0.5)
+
+
+def critical_values_for_correlation(alpha, n):
+    # Calculate degrees of freedom for the t-distribution
+    degrees_of_freedom = n - 2
+
+    # Calculate the critical t-value (two-tailed test)
+    t_critical = t.ppf(1 - alpha / 2, degrees_of_freedom)
+
+    # Calculate the critical values of r
+    r_critical_positive = t_critical / ((n - 2 + t_critical ** 2) ** 0.5)
+    r_critical_negative = -r_critical_positive
+
+    return r_critical_negative, r_critical_positive
+
+
+def y_int_regression_line(data):
+    n = len(data)
+    numerator = (sum([y for _, y in data]) * sum([x ** 2 for x, _ in data])) - \
+                (sum([x for x, _ in data]) * sum([x * y for x, y in data]))
+    denominator = (n * sum([x ** 2 for x, _ in data])) - (sum([x for x, _ in data]) ** 2)
+    return numerator / denominator
+
+
+def slope_regression_line(data):
+    n = len(data)
+    numerator = (n * sum([x * y for x, y in data])) - (sum([x for x, _ in data]) * sum([y for _, y in data]))
+    denominator = n * sum([x ** 2 for x, _ in data]) - sum(x for x, _ in data) ** 2
+    return numerator / denominator
