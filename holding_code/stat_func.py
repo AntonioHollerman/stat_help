@@ -1056,6 +1056,34 @@ def mar_err_two_means(mean1, mean2, E):
 
 
 def t_for_proportion(p_hat, p, n):
+    """
+        Calculate the t-statistic for testing a hypothesis about a population proportion.
+
+        Parameters:
+            p_hat (float): The sample proportion.
+            p (float): The hypothesized population proportion under the null hypothesis.
+            n (int): The sample size.
+
+        Returns:
+            float: The t-statistic value.
+
+        Notes:
+            The t-statistic is used in hypothesis testing to determine whether the sample proportion
+            significantly differs from the hypothesized population proportion. It measures the number
+            of standard errors the sample proportion is away from the hypothesized proportion.
+
+            The formula for the t-statistic is (p_hat - p) / sqrt((p * (1 - p)) / n), where p_hat is the
+            sample proportion, p is the hypothesized proportion, and n is the sample size.
+
+            If the absolute value of the t-statistic is large, it suggests a significant difference
+            between the sample and population proportions, supporting the alternative hypothesis.
+
+        Example:
+            Suppose you want to test whether the proportion of people in a city who prefer coffee over
+            tea is significantly different from 0.5. You collect a sample of 200 people, and 120 of them
+            prefer coffee. To calculate the t-statistic for this sample, you can use:
+            t_stat = t_for_proportion(p_hat=120/200, p=0.5, n=200)
+        """
     q = 1 - p
     numerator = p_hat - p
     denominator = ((p * q) / n) ** 0.5
@@ -1063,18 +1091,107 @@ def t_for_proportion(p_hat, p, n):
 
 
 def t_for_sta(pop_deviation, sample_deviation, n):
+    """
+    Calculate the F-statistic for testing equality of variances between two samples.
+
+    Parameters:
+        pop_deviation (float): The hypothesized population standard deviation under the null hypothesis.
+        sample_deviation (float): The sample standard deviation.
+        n (int): The sample size.
+
+    Returns:
+        float: The F-statistic value.
+
+    Notes:
+        The F-statistic is used in hypothesis testing to assess whether the variances of two samples are equal.
+        It measures the ratio of sample variances, which follows an F-distribution under the null hypothesis.
+
+        The formula for the F-statistic is ((n - 1) * sample_deviation**2) / (pop_deviation**2), where
+        pop_deviation is the hypothesized population standard deviation, sample_deviation is the sample
+        standard deviation, and n is the sample size.
+
+        If the F-statistic is close to 1, it suggests that the sample variances are similar, supporting the null
+        hypothesis of equal variances. However, if the F-statistic is significantly different from 1, it indicates
+        unequal variances, favoring the alternative hypothesis.
+
+    Example:
+        Suppose you have two samples of test scores from two different groups, and you want to test whether their
+        variances are equal. For Group A, you have a sample standard deviation of 5, and for Group B, you hypothesize
+        a population standard deviation of 4. If both samples have a size of 30, you can calculate the F-statistic as:
+        f_stat = t_for_sta(pop_deviation=4, sample_deviation=5, n=30)
+    """
     numerator = (n - 1) * sample_deviation ** 2
     denominator = pop_deviation ** 2
     return numerator / denominator
 
 
 def t_for_mean(mean_x, u, s, n):
+    """
+    Calculate the t-statistic for testing a hypothesis about the mean of a population.
+
+    Parameters:
+        mean_x (float): The sample mean.
+        u (float): The hypothesized population mean under the null hypothesis.
+        s (float): The sample standard deviation.
+        n (int): The sample size.
+
+    Returns:
+        float: The t-statistic value.
+
+    Notes:
+        The t-statistic is used in hypothesis testing to determine whether the sample mean
+        significantly differs from the hypothesized population mean. It measures the number
+        of standard errors the sample mean is away from the hypothesized mean.
+
+        The formula for the t-statistic is (mean_x - u) / (s / (n ** 0.5)), where mean_x is
+        the sample mean, u is the hypothesized population mean, s is the sample standard deviation,
+        and n is the sample size.
+
+        If the absolute value of the t-statistic is large, it suggests a significant difference
+        between the sample mean and the population mean, supporting the alternative hypothesis.
+
+    Example:
+        Suppose you want to test whether the average height of students in a school significantly
+        differs from 170 cm. You collect a sample of 50 students and find the sample mean height
+        to be 175 cm with a sample standard deviation of 5 cm. To calculate the t-statistic for
+        this sample, you can use:
+        t_stat = t_for_mean(mean_x=175, u=170, s=5, n=50)
+    """
     numerator = mean_x - u
     denominator = s / (n ** 0.5)
     return numerator / denominator
 
 
 def r_coefficient(data):
+    """
+    Calculate the Pearson correlation coefficient (r) for a given dataset.
+
+    Parameters:
+        data (dict or list of tuples): The dataset to calculate the correlation coefficient from.
+                                     If a dictionary is provided, the keys represent the x-values,
+                                     and the values represent the corresponding y-values.
+                                     If a list of tuples is provided, each tuple contains (x, y) pairs.
+
+    Returns:
+        float: The Pearson correlation coefficient (r).
+
+    Notes:
+        The Pearson correlation coefficient is a measure of the linear relationship between two variables.
+        It ranges from -1 to 1, where -1 indicates a perfect negative correlation, 1 indicates a perfect
+        positive correlation, and 0 indicates no linear correlation.
+
+        The formula for the Pearson correlation coefficient (r) is given by:
+        r = (n * Σ(x * y) - Σ(x) * Σ(y)) / sqrt((n * Σ(x^2) - Σ(x)^2) * (n * Σ(y^2) - Σ(y)^2))
+
+        Where n is the number of data points, Σ denotes summation, x and y are the variables, and (x, y)
+        represents the data points in the dataset.
+
+    Example:
+        Suppose you have a dataset of exam scores and corresponding study hours:
+        data = {3: 50, 4: 70, 5: 65, 6: 80, 7: 75}
+        To calculate the Pearson correlation coefficient for this dataset, you can use:
+        correlation_coefficient = r_coefficient(data)
+    """
     n = len(data)
     if type(data) == dict:
         numerator = (n * sum([x * y for x, y in data.items()])) - \
@@ -1091,10 +1208,62 @@ def r_coefficient(data):
 
 
 def test_stat_correlation(r, n):
+    """
+    Calculate the test statistic for testing the significance of a correlation coefficient.
+
+    Parameters:
+        r (float): The Pearson correlation coefficient.
+        n (int): The number of data points used to compute the correlation coefficient.
+
+    Returns:
+        float: The test statistic value.
+
+    Notes:
+        The test statistic is used to test the significance of the correlation coefficient (r)
+        obtained from a sample. It determines whether the observed correlation is significantly
+        different from zero under the null hypothesis of no correlation.
+
+        The formula for the test statistic is r / sqrt((1 - r**2) / (n - 2)), where r is the
+        correlation coefficient, and n is the number of data points used to calculate it.
+
+        If the absolute value of the test statistic is large, it indicates a significant correlation
+        between the variables, supporting the alternative hypothesis.
+
+    Example:
+        Suppose you have computed the Pearson correlation coefficient for a dataset to be 0.75, and the
+        dataset contains 50 data points. To calculate the test statistic for this correlation coefficient,
+        you can use:
+        test_stat = test_stat_correlation(r=0.75, n=50)
+    """
     return r / (((1 - r**2) / (n - 2)) ** 0.5)
 
 
 def critical_values_for_correlation(alpha, n):
+    """
+    Calculate the critical values of the Pearson correlation coefficient (r) for a given significance level.
+
+    Parameters:
+        alpha (float): The desired significance level (alpha) for the two-tailed hypothesis test.
+        n (int): The number of data points used to compute the correlation coefficient.
+
+    Returns:
+        tuple: A tuple containing the critical values for r for a two-tailed test.
+               The first value is the negative critical value, and the second value is the positive critical value.
+
+    Notes:
+        The critical values of r are used to determine the significance of the correlation coefficient (r)
+        obtained from a sample. For a two-tailed test, the critical values correspond to the values of r
+        at which the null hypothesis of no correlation is rejected.
+
+        The critical values are calculated using the t-distribution with degrees of freedom (n - 2). The
+        t-distribution is used since r follows a t-distribution under the null hypothesis.
+
+    Example:
+        Suppose you want to perform a two-tailed hypothesis test for a correlation coefficient obtained from
+        a dataset with 30 data points and a significance level (alpha) of 0.05. To calculate the critical values
+        of r for this test, you can use:
+        r_critical_negative, r_critical_positive = critical_values_for_correlation(alpha=0.05, n=30)
+    """
     # Calculate degrees of freedom for the t-distribution
     degrees_of_freedom = n - 2
 
@@ -1109,6 +1278,33 @@ def critical_values_for_correlation(alpha, n):
 
 
 def y_int_regression_line(data):
+    """
+    Calculate the y-intercept (b) of the regression line for a given dataset.
+
+    Parameters:
+        data (list of tuples): The dataset used to compute the regression line.
+                               Each tuple in the list contains (x, y) pairs.
+
+    Returns:
+        float: The y-intercept (b) of the regression line.
+
+    Notes:
+        The y-intercept (b) of the regression line represents the value of the dependent variable (y)
+        when the independent variable (x) is zero. It is a key parameter in the equation of the regression
+        line (y = mx + b), where m is the slope of the line.
+
+        The y-intercept is calculated using the formula:
+        b = (Σ(y) * Σ(x^2) - Σ(x) * Σ(x * y)) / (n * Σ(x^2) - Σ(x)^2)
+
+        Where n is the number of data points, Σ denotes summation, x and y are the variables, and (x, y)
+        represents the data points in the dataset.
+
+    Example:
+        Suppose you have a dataset of exam scores and corresponding study hours:
+        data = [(3, 50), (4, 70), (5, 65), (6, 80), (7, 75)]
+        To calculate the y-intercept (b) of the regression line for this dataset, you can use:
+        y_intercept = y_int_regression_line(data)
+    """
     n = len(data)
     numerator = (sum([y for _, y in data]) * sum([x ** 2 for x, _ in data])) - \
                 (sum([x for x, _ in data]) * sum([x * y for x, y in data]))
@@ -1117,7 +1313,131 @@ def y_int_regression_line(data):
 
 
 def slope_regression_line(data):
+    """
+    Calculate the slope (m) of the regression line for a given dataset.
+
+    Parameters:
+        data (list of tuples): The dataset used to compute the regression line.
+                               Each tuple in the list contains (x, y) pairs.
+
+    Returns:
+        float: The slope (m) of the regression line.
+
+    Notes:
+        The slope (m) of the regression line represents the rate of change in the dependent variable (y)
+        with respect to the independent variable (x). It indicates the direction and steepness of the line.
+
+        The slope is calculated using the formula:
+        m = (n * Σ(x * y) - Σ(x) * Σ(y)) / (n * Σ(x^2) - Σ(x)^2)
+
+        Where n is the number of data points, Σ denotes summation, x and y are the variables, and (x, y)
+        represents the data points in the dataset.
+
+    Example:
+        Suppose you have a dataset of exam scores and corresponding study hours:
+        data = [(3, 50), (4, 70), (5, 65), (6, 80), (7, 75)]
+        To calculate the slope (m) of the regression line for this dataset, you can use:
+        slope = slope_regression_line(data)
+    """
     n = len(data)
     numerator = (n * sum([x * y for x, y in data])) - (sum([x for x, _ in data]) * sum([y for _, y in data]))
     denominator = n * sum([x ** 2 for x, _ in data]) - sum(x for x, _ in data) ** 2
     return numerator / denominator
+
+
+def arithmetic_sequence(a, d, n):
+    """
+    Generate an arithmetic sequence.
+
+    Parameters:
+        a (float): The first term (initial value) of the arithmetic sequence.
+        d (float): The common difference between consecutive terms.
+        n (int): The number of terms to generate in the sequence.
+
+    Returns:
+        list: The list containing the arithmetic sequence.
+
+    Notes:
+        An arithmetic sequence is a sequence of numbers where each term (after the first) is obtained by
+        adding a constant difference (d) to the previous term. The formula for the nth term of the sequence
+        is given by a + (n - 1) * d.
+
+    Example:
+        To generate an arithmetic sequence starting from 5 with a common difference of 2 and containing
+        6 terms, you can use:
+        sequence = arithmetic_sequence(a=5, d=2, n=6)
+    """
+    return [a + (i - 1) * d for i in range(1, n + 1)]
+
+
+def geometric_sequence(a, r, n):
+    """
+    Generate a geometric sequence.
+
+    Parameters:
+        a (float): The first term (initial value) of the geometric sequence.
+        r (float): The common ratio between consecutive terms.
+        n (int): The number of terms to generate in the sequence.
+
+    Returns:
+        list: The list containing the geometric sequence.
+
+    Notes:
+        A geometric sequence is a sequence of numbers where each term (after the first) is obtained by
+        multiplying the previous term by a constant ratio (r). The formula for the nth term of the sequence
+        is given by a * r ** (n - 1).
+
+    Example:
+        To generate a geometric sequence starting from 2 with a common ratio of 3 and containing
+        5 terms, you can use:
+        sequence = geometric_sequence(a=2, r=3, n=5)
+    """
+    return [a * r ** (i - 1) for i in range(1, n + 1)]
+
+
+def arit_part_sum(a, d, n):
+    """
+    Calculate the partial sum of an arithmetic sequence.
+
+    Parameters:
+        a (float): The first term (initial value) of the arithmetic sequence.
+        d (float): The common difference between consecutive terms.
+        n (int): The number of terms to include in the partial sum.
+
+    Returns:
+        float: The value of the partial sum.
+
+    Notes:
+        The partial sum of an arithmetic sequence is the sum of the first 'n' terms of the sequence.
+        The formula to calculate the partial sum is (n / 2) * ((2 * a) + ((n - 1) * d)).
+
+    Example:
+        To calculate the partial sum of the first 10 terms of an arithmetic sequence with
+        a starting value of 3 and a common difference of 5, you can use:
+        partial_sum = arit_part_sum(a=3, d=5, n=10)
+    """
+    return (n / 2) * ((2 * a) + ((n - 1) * d))
+
+
+def geo_part_sum(a, r, n):
+    """
+    Calculate the partial sum of a geometric sequence.
+
+    Parameters:
+        a (float): The first term (initial value) of the geometric sequence.
+        r (float): The common ratio between consecutive terms.
+        n (int): The number of terms to include in the partial sum.
+
+    Returns:
+        float: The value of the partial sum.
+
+    Notes:
+        The partial sum of a geometric sequence is the sum of the first 'n' terms of the sequence.
+        The formula to calculate the partial sum is a * ((1 - r ** n) / (1 - r)).
+
+    Example:
+        To calculate the partial sum of the first 8 terms of a geometric sequence with
+        a starting value of 2 and a common ratio of 3, you can use:
+        partial_sum = geo_part_sum(a=2, r=3, n=8)
+    """
+    return a * ((1 - r ** n) / (1 - r))
